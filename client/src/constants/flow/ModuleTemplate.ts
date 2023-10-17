@@ -2195,5 +2195,421 @@ export const appTemplates: (AppItemType & { avatar: string; intro: string })[] =
         ]
       }
     ]
+  },{
+    id: 'chatlawChatFastKb',
+    avatar: '/imgs/module/chatlaw.png',
+    name: 'chatlaw快速知识库模型',
+    intro: '自训练的chatlaw语言模型，基于知识库',
+    modules: [
+      {
+        moduleId: 'userChatInput',
+        name: '用户问题(对话入口)',
+        flowType: 'questionInput',
+        position: {
+          x: 464.32198615344566,
+          y: 1602.2698463081606
+        },
+        inputs: [
+          {
+            key: 'userChatInput',
+            type: 'systemInput',
+            label: '用户问题',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'userChatInput',
+            label: '用户问题',
+            type: 'source',
+            valueType: 'string',
+            targets: [
+              {
+                moduleId: 'chatModule',
+                key: 'userChatInput'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        moduleId: 'history',
+        name: '聊天记录',
+        flowType: 'historyNode',
+        position: {
+          x: 452.5466249541586,
+          y: 1276.3930310334215
+        },
+        inputs: [
+          {
+            key: 'maxContext',
+            type: 'numberInput',
+            label: '最长记录数',
+            value: 6,
+            min: 0,
+            max: 50,
+            connected: true
+          },
+          {
+            key: 'history',
+            type: 'hidden',
+            label: '聊天记录',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'history',
+            label: '聊天记录',
+            valueType: 'chat_history',
+            type: 'source',
+            targets: [
+              {
+                moduleId: 'chatModule',
+                key: 'history'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        moduleId: 'chatModule',
+        name: 'AI 对话',
+        flowType: 'chatNode',
+        showStatus: true,
+        position: {
+          x: 1150.8317145593148,
+          y: 957.9676672880053
+        },
+        inputs: [
+          {
+            key: 'model',
+            type: 'custom',
+            label: '对话模型',
+            value: 'chatlaw-fastkb',
+            list: [],
+            connected: true
+          },
+          {
+            key: 'temperature',
+            type: 'slider',
+            label: '温度',
+            value: 0,
+            min: 0,
+            max: 10,
+            step: 1,
+            markList: [
+              {
+                label: '严谨',
+                value: 0
+              },
+              {
+                label: '发散',
+                value: 10
+              }
+            ],
+            connected: true
+          },
+          {
+            key: 'maxToken',
+            type: 'custom',
+            label: '回复上限',
+            value: 8000,
+            min: 100,
+            max: 16000,
+            step: 50,
+            markList: [
+              {
+                label: '100',
+                value: 100
+              },
+              {
+                label: '16000',
+                value: 16000
+              }
+            ],
+            connected: true
+          },
+          {
+            key: 'systemPrompt',
+            type: 'textarea',
+            label: '系统提示词',
+            valueType: 'string',
+            description:
+              '模型固定的引导词，通过调整该内容，可以引导模型聊天方向。该内容会被固定在上下文的开头。可使用变量，例如 {{language}}',
+            placeholder:
+              '模型固定的引导词，通过调整该内容，可以引导模型聊天方向。该内容会被固定在上下文的开头。可使用变量，例如 {{language}}',
+            value: '',
+            connected: true
+          },
+          {
+            key: 'limitPrompt',
+            type: 'textarea',
+            valueType: 'string',
+            label: '限定词',
+            description:
+              '限定模型对话范围，会被放置在本次提问前，拥有强引导和限定性。可使用变量，例如 {{language}}。引导例子:\n1. 知识库是关于 Laf 的介绍，参考知识库回答问题，与 "Laf" 无关内容，直接回复: "我不知道"。\n2. 你仅回答关于 "xxx" 的问题，其他问题回复: "xxxx"',
+            placeholder:
+              '限定模型对话范围，会被放置在本次提问前，拥有强引导和限定性。可使用变量，例如 {{language}}。引导例子:\n1. 知识库是关于 Laf 的介绍，参考知识库回答问题，与 "Laf" 无关内容，直接回复: "我不知道"。\n2. 你仅回答关于 "xxx" 的问题，其他问题回复: "xxxx"',
+            value: '',
+            connected: true
+          },
+          {
+            key: 'switch',
+            type: 'target',
+            label: '触发器',
+            valueType: 'any',
+            connected: false
+          },
+          {
+            key: 'quoteQA',
+            type: 'target',
+            label: '引用内容',
+            valueType: 'kb_quote',
+            connected: false
+          },
+          {
+            key: 'history',
+            type: 'target',
+            label: '聊天记录',
+            valueType: 'chat_history',
+            connected: true
+          },
+          {
+            key: 'userChatInput',
+            type: 'target',
+            label: '用户问题',
+            required: true,
+            valueType: 'string',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'answerText',
+            label: '模型回复',
+            description: '直接响应，无需配置',
+            type: 'hidden',
+            targets: []
+          },
+          {
+            key: 'finish',
+            label: '回复结束',
+            description: 'AI 回复完成后触发',
+            valueType: 'boolean',
+            type: 'source',
+            targets: []
+          }
+        ]
+      }
+    ]
+  },{
+    id: 'chatlawChatKb',
+    avatar: '/imgs/module/chatlaw.png',
+    name: 'chatlaw知识库模型',
+    intro: '自训练的chatlaw语言模型，基于知识库',
+    modules: [
+      {
+        moduleId: 'userChatInput',
+        name: '用户问题(对话入口)',
+        flowType: 'questionInput',
+        position: {
+          x: 464.32198615344566,
+          y: 1602.2698463081606
+        },
+        inputs: [
+          {
+            key: 'userChatInput',
+            type: 'systemInput',
+            label: '用户问题',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'userChatInput',
+            label: '用户问题',
+            type: 'source',
+            valueType: 'string',
+            targets: [
+              {
+                moduleId: 'chatModule',
+                key: 'userChatInput'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        moduleId: 'history',
+        name: '聊天记录',
+        flowType: 'historyNode',
+        position: {
+          x: 452.5466249541586,
+          y: 1276.3930310334215
+        },
+        inputs: [
+          {
+            key: 'maxContext',
+            type: 'numberInput',
+            label: '最长记录数',
+            value: 6,
+            min: 0,
+            max: 50,
+            connected: true
+          },
+          {
+            key: 'history',
+            type: 'hidden',
+            label: '聊天记录',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'history',
+            label: '聊天记录',
+            valueType: 'chat_history',
+            type: 'source',
+            targets: [
+              {
+                moduleId: 'chatModule',
+                key: 'history'
+              }
+            ]
+          }
+        ]
+      },
+      {
+        moduleId: 'chatModule',
+        name: 'AI 对话',
+        flowType: 'chatNode',
+        showStatus: true,
+        position: {
+          x: 1150.8317145593148,
+          y: 957.9676672880053
+        },
+        inputs: [
+          {
+            key: 'model',
+            type: 'custom',
+            label: '对话模型',
+            value: 'chatlaw-kb',
+            list: [],
+            connected: true
+          },
+          {
+            key: 'temperature',
+            type: 'slider',
+            label: '温度',
+            value: 0,
+            min: 0,
+            max: 10,
+            step: 1,
+            markList: [
+              {
+                label: '严谨',
+                value: 0
+              },
+              {
+                label: '发散',
+                value: 10
+              }
+            ],
+            connected: true
+          },
+          {
+            key: 'maxToken',
+            type: 'custom',
+            label: '回复上限',
+            value: 8000,
+            min: 100,
+            max: 16000,
+            step: 50,
+            markList: [
+              {
+                label: '100',
+                value: 100
+              },
+              {
+                label: '16000',
+                value: 16000
+              }
+            ],
+            connected: true
+          },
+          {
+            key: 'systemPrompt',
+            type: 'textarea',
+            label: '系统提示词',
+            valueType: 'string',
+            description:
+              '模型固定的引导词，通过调整该内容，可以引导模型聊天方向。该内容会被固定在上下文的开头。可使用变量，例如 {{language}}',
+            placeholder:
+              '模型固定的引导词，通过调整该内容，可以引导模型聊天方向。该内容会被固定在上下文的开头。可使用变量，例如 {{language}}',
+            value: '',
+            connected: true
+          },
+          {
+            key: 'limitPrompt',
+            type: 'textarea',
+            valueType: 'string',
+            label: '限定词',
+            description:
+              '限定模型对话范围，会被放置在本次提问前，拥有强引导和限定性。可使用变量，例如 {{language}}。引导例子:\n1. 知识库是关于 Laf 的介绍，参考知识库回答问题，与 "Laf" 无关内容，直接回复: "我不知道"。\n2. 你仅回答关于 "xxx" 的问题，其他问题回复: "xxxx"',
+            placeholder:
+              '限定模型对话范围，会被放置在本次提问前，拥有强引导和限定性。可使用变量，例如 {{language}}。引导例子:\n1. 知识库是关于 Laf 的介绍，参考知识库回答问题，与 "Laf" 无关内容，直接回复: "我不知道"。\n2. 你仅回答关于 "xxx" 的问题，其他问题回复: "xxxx"',
+            value: '',
+            connected: true
+          },
+          {
+            key: 'switch',
+            type: 'target',
+            label: '触发器',
+            valueType: 'any',
+            connected: false
+          },
+          {
+            key: 'quoteQA',
+            type: 'target',
+            label: '引用内容',
+            valueType: 'kb_quote',
+            connected: false
+          },
+          {
+            key: 'history',
+            type: 'target',
+            label: '聊天记录',
+            valueType: 'chat_history',
+            connected: true
+          },
+          {
+            key: 'userChatInput',
+            type: 'target',
+            label: '用户问题',
+            required: true,
+            valueType: 'string',
+            connected: true
+          }
+        ],
+        outputs: [
+          {
+            key: 'answerText',
+            label: '模型回复',
+            description: '直接响应，无需配置',
+            type: 'hidden',
+            targets: []
+          },
+          {
+            key: 'finish',
+            label: '回复结束',
+            description: 'AI 回复完成后触发',
+            valueType: 'boolean',
+            type: 'source',
+            targets: []
+          }
+        ]
+      }
+    ]
   }
 ];

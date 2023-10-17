@@ -25,6 +25,7 @@ export type FeConfigsType = {
   googleClientVerKey?: string;
   gitLoginKey?: string;
   sms?: { [key:string]:string};
+  chatlaw?: { [key:string]:string};
   scripts?: { [key: string]: string }[];
 };
 export type SystemEnvType = {

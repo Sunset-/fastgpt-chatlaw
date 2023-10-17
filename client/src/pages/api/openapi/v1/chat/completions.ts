@@ -365,7 +365,7 @@ export async function dispatchModules({
       if(chatNode){
         var model = chatNode.inputs.find(item=>item.key=='model')
         if(model){
-          if(model?.value=='chatlaw'){
+          if(model?.value=='chatlaw'||model?.value=='chatlaw-fastkb'||model?.value=='chatlaw-kb'){
             isChatlaw = true
           }
           console.log("!!!:",model?.value)
